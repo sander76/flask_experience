@@ -1,10 +1,15 @@
 """Database."""
 
+import logging
 import sqlite3
 
 import click
 from flask import current_app, g
 from flask.cli import with_appcontext
+
+_LOGGER = logging.getLogger(__name__)
+
+#  todo: Add SQLAlchemy.
 
 
 def init_app(app):
@@ -16,6 +21,7 @@ def init_db():
     db = get_db()
 
     with current_app.open_resource("schema.sql") as f:
+        _LOGGER.info("Creating database from %s", f)
         db.executescript(f.read().decode("utf-8"))
 
 

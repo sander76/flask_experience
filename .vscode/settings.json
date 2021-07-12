@@ -1,7 +1,10 @@
 {
     "cSpell.words": [
+        "dbase",
         "isort",
         "pydocstyle",
-        "repos"
-    ]
+        "repos",
+        "werkzeug"
+    ],
+    "python.testing.nosetestPath": ""
 }

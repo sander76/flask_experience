@@ -4,7 +4,7 @@ from pathlib import Path
 
 from flask import Flask
 
-from . import db
+from . import auth, blog, db
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,4 +31,9 @@ def create_app(test_config=None):
         return "Hello you."
 
     db.init_app(app)
+
+    app.register_blueprint(auth.bp)
+    app.register_blueprint(blog.bp)
+    app.add_url_rule("/", endpoint="index")  # type: ignore
+
     return app
