@@ -15,11 +15,7 @@ from flask_blog.view_models.index_view_model import IndexViewModel
 
 _LOGGER = logging.getLogger(__name__)
 
-# from flask_blog.orm.db import get_db
-
 bp = Blueprint("blog", __name__)
-
-# todo: uncomment all functions.
 
 
 def _get_post(id: int, check_author: bool = True) -> post.Post:
