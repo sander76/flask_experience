@@ -7,9 +7,12 @@ libaries have been released.
 In this repo I am adopting the basic Flask tutorial and changing it by trying
 to touch all the new goodies mentioned above. 
 
+Look at the different branches for different types of tasks I'm working on.
+
 Some attention points:
 
 - SQL Alchemy database layer.
 - Pydantic settings management.
 - Pre-commit hooks
 - Pytest automated testing.
+- implement htmx

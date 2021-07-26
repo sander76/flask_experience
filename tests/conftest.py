@@ -3,28 +3,35 @@ from pathlib import Path
 import pytest
 
 from flask_blog import create_app
-from flask_blog.db import get_db, init_db
+from flask_blog.config import Settings
+from flask_blog.orm import db
+from flask_blog.orm.user import User
+from tests import data
 
 HERE = Path(__file__).parent
 
 
-def _read_sql():
-    with open(HERE / "data.sql") as file:
-        data = file.read()
-
-    return data
-
-
-@pytest.fixture
+@pytest.fixture()
 def app(tmp_path):
-    dbase_file: Path = tmp_path / "dbase.sqlite"
-    app = create_app({"TESTING": True, "DATABASE": dbase_file})
+    """Create an app with a testing database.
 
-    with app.app_context():
-        init_db()
-        get_db().executescript(_read_sql())
+    Database is empty.
+    Tot populate it (per test function) use the data module in the test package.
+    """
+    sqlite_file = tmp_path / "dbase.sqlite"
+    dbase_file: str = f"sqlite+pysqlite:///{sqlite_file.as_posix()}"
+
+    settings = Settings()
+
+    settings.TESTING = True
+    settings.DEVELOPMENT = True
+    settings.database_url = dbase_file
+
+    app = create_app(settings)
 
     yield app
+
+    db.close_db()
 
 
 @pytest.fixture
@@ -40,8 +47,10 @@ def runner(app):
 class AuthActions:
     def __init__(self, client) -> None:
         self._client = client
+        self.user: User = data.get_users()[-1]
 
-    def login(self, username="test", password="test"):
+    def login(self, username="Graham", password="the island"):
+
         return self._client.post(
             "/auth/login", data={"username": username, "password": password}
         )

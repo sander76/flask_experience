@@ -1,7 +1,9 @@
 import pytest
 from flask import g, session
 
-from flask_blog.db import get_db
+from tests import data
+
+# from flask_blog.db import get_db
 
 
 def test_register_get_form(client):
@@ -9,14 +11,11 @@ def test_register_get_form(client):
 
 
 def test_register_new_user(client, app):
-    response = client.post("/auth/register", data={"username": "a", "password": "a"})
+    """New user registration should redirect to the login page."""
+    response = client.post(
+        "/auth/register", data={"username": "a", "password": "123456"}
+    )
     assert "http://localhost/auth/login" == response.headers["Location"]
-
-    with app.app_context():
-        assert (
-            get_db().execute("SELECT * FROM user WHERE username= 'a'").fetchone()
-            is not None
-        )
 
 
 def test_login_get_form(client, auth):
@@ -24,20 +23,25 @@ def test_login_get_form(client, auth):
 
 
 def test_login_success(client, auth):
+    data.add_data(data.get_users())
     response = auth.login()
     assert response.headers["Location"] == "http://localhost/"
 
     with client:
         client.get("/")
-        assert session["user_id"] == 1
-        assert g.user["username"] == "test"
+        assert session["user_id"] == 2
+        assert g.user.username == "Graham"
 
 
 @pytest.mark.parametrize(
     ("username", "password", "message"),
-    (("a", "test", b"Incorrect username."), ("test", "a", b"Incorrect password.")),
+    (
+        ("wrong_user", "test", b"User does not exist"),
+        ("Graham", "a", b"Incorrect password"),
+    ),
 )
 def test_login_validate_input(auth, username, password, message):
+    data.add_data(data.get_users())
     response = auth.login(username, password)
 
     assert message in response.data
